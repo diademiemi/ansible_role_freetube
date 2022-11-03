@@ -1,0 +1,18 @@
+---
+freetube_version: 0.18.0
+freetube_release_channel: beta
+
+freetube_package_format: "{% if ansible_facts['os_family'] == 'RedHat' %}rpm{% elif ansible_facts['os_family'] == 'Debian' %}deb{% else %}flatpak{% endif %}"
+
+freetube_package: "{{ freetube_package_map[freetube_package_format][ansible_architecture] | default('') }}"
+
+freetube_url_base: https://github.com/FreeTubeApp/FreeTube/releases/download/v{{ freetube_version }}-{{ freetube_release_channel }}
+freetube_package_map:
+  rpm:
+    x86_64: freetube_{{ freetube_version }}_amd64.rpm
+    arm64: freetube_{{ freetube_version }}_arm64.rpm
+  deb:
+    x86_64: freetube_{{ freetube_version }}_amd64.deb
+    arm64: freetube_{{ freetube_version }}_arm64.deb
+    armhf: freetube_{{ freetube_version }}_armv7l.deb
+freetube_flathub_package: https://dl.flathub.org/repo/appstream/io.freetubeapp.FreeTube.flatpakref

@@ -1,0 +1,26 @@
+---
+- name: Download FreeTube package
+  ansible.builtin.get_url:
+    url: "{{ freetube_url_base }}/{{ freetube_package }}"
+    dest: "/tmp/{{ freetube_package }}"
+    mode: 0644
+  when: freetube_package_format != 'flatpak'
+
+- name: Install FreeTube package on Debian
+  become: true
+  ansible.builtin.apt:
+    deb: "/tmp/{{ freetube_package }}"
+    state: present
+  when: ansible_facts['os_family'] == 'Debian' and freetube_package_format != 'flatpak'
+
+- name: Install FreeTube package on RedHat
+  become: true
+  ansible.builtin.yum:
+    name: "/tmp/{{ freetube_package }}"
+    state: present
+    disable_gpg_check: true # FreeTube RPMs are not signed
+  when: ansible_facts['os_family'] == 'RedHat' and freetube_package_format != 'flatpak'
+
+- name: Import flatpak tasks
+  import_tasks: flatpak.yml
+  when: freetube_package_format == 'flatpak'
